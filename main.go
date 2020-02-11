@@ -55,16 +55,26 @@ func readFile() (totalCount int, values []int) {
 }
 
 func compute(total int, values []int) (pos []int) {
-	totalComputed := values[len(values)-1]
-	pos = append(pos, len(values)-1)
+	var totalComputed int
 
-	for index, value := range values {
-		totalComputed += value
-		if totalComputed >= total || index == len(values) {
-			return
+	for i := len(values) - 1; i >= 0; i-- {
+		if total < totalComputed+values[i] {
+			break
 		}
-		pos = append(pos, index)
+
+		totalComputed += values[i]
+		pos = append(pos, i)
 	}
+
+	for i := 0; i < len(values)-1; i++ {
+		if total < totalComputed+values[i] {
+			break
+		}
+
+		totalComputed += values[i]
+		pos = append(pos, i)
+	}
+
 	return
 }
 
@@ -79,12 +89,8 @@ func writeToFile(pos []int) {
 	}
 
 	for _, value := range pos {
-		if value == len(pos)-1 {
-			_, err = file.WriteString(fmt.Sprintf("%d", value))
-		} else {
-			_, err = file.WriteString(fmt.Sprintf("%d ", value))
+		_, err = file.WriteString(fmt.Sprintf("%d ", value))
 
-		}
 		if err != nil {
 			log.Fatalln(err)
 		}
